@@ -1620,25 +1620,15 @@ async function exportAnalysisImage(){
     const name='PEM科研参数筛选-'+data.stamp.toISOString().slice(0,10)+'.png';
     const mobile=/Android|iPhone|iPad|iPod|MicroMessenger/i.test(navigator.userAgent)||
       (window.matchMedia&&window.matchMedia('(pointer: coarse)').matches);
-    let shared=false;
-    if(mobile && navigator.share && navigator.canShare && typeof File!=='undefined'){
-      const file=new File([blob],name,{type:'image/png'});
-      try{
-        if(navigator.canShare({files:[file]})){
-          await navigator.share({files:[file],title:'PEM 科研参数筛选报告'});shared=true;
-        }
-      }catch(err){if(err&&err.name==='AbortError'){setStatus('warn','已取消图片分享',true);return;}}
-    }
-    if(mobile && !shared){
+    if(mobile){
       showReportPreview(blob,name);
       setStatus('ok','分析图片已生成，可在预览中保存',true);
-    }else if(!shared){
+    }else{
       const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;
       document.body.appendChild(a);a.click();
       setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},60000);
       setStatus('ok','已导出分析图片 '+name,true);
     }
-    if(shared) setStatus('ok','已打开图片分享',true);
   }catch(err){setStatus('bad','图片导出失败：'+(err&&err.message?err.message:err),true);}
   finally{btn.disabled=false;btn.textContent=label;}
 }
